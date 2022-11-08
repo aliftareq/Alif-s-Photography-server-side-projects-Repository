@@ -29,11 +29,32 @@ async function run() {
 }
 run().catch(err => console.log(err))
 
+//here the collection
+const ServicesCollection = client.db('AlifCatering').collection('Services')
+
 //endsPoints 
 
 //root api
 app.get('/', (req, res) => {
     res.send('alif catering service server is running')
+})
+
+app.get('/services', async (req, res) => {
+    try {
+        const query = {}
+        const cursor = ServicesCollection.find(query)
+        const services = await cursor.toArray()
+        res.send({
+            success: true,
+            data: services
+        })
+    }
+    catch (error) {
+        res.send({
+            success: false,
+            data: error.message,
+        })
+    }
 })
 
 app.listen(port, () => {
