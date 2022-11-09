@@ -30,7 +30,7 @@ async function run() {
 run().catch(err => console.log(err))
 
 //here the collection
-const ServicesCollection = client.db('AlifCatering').collection('Services')
+const ServicesCollection = client.db('alifPhotography').collection('Services')
 
 //endsPoints 
 
@@ -39,21 +39,23 @@ app.get('/', (req, res) => {
     res.send('alif catering service server is running')
 })
 
+// api for all/multiple data
 app.get('/services', async (req, res) => {
     try {
         const query = {}
         const cursor = ServicesCollection.find(query)
-        const services = await cursor.toArray()
-        res.send({
-            success: true,
-            data: services
-        })
+        const value = req.query.route
+        if (value) {
+            const services = await cursor.limit(3).toArray()
+            res.send(services)
+        }
+        else {
+            const services = await cursor.toArray()
+            res.send(services)
+        }
     }
     catch (error) {
-        res.send({
-            success: false,
-            data: error.message,
-        })
+        res.send(error.message)
     }
 })
 
