@@ -98,7 +98,6 @@ app.get('/services/reviews/:id', async (req, res) => {
 // api for get review by email
 app.get('/reviews', async (req, res) => {
     const email = req.query.email
-    console.log(email);
     try {
         const cursor = ReviewsCollection.find({ ReviewerEmail: email })
         const reviews = await cursor.toArray()
@@ -122,12 +121,26 @@ app.delete('/review/:id', async (req, res) => {
 //api for get single review
 app.get('/review/:id', async (req, res) => {
     id = req.params.id
-    console.log(id);
     try {
         const review = await ReviewsCollection.findOne({ _id: ObjectId(id) })
         res.send(review)
     }
     catch (error) {
+        res.send(error.message)
+    }
+})
+//api for updating a review
+app.patch('/review/:id', async (req, res) => {
+    const id = req.params.id
+    const reviewText = req.body.newReviewText
+    try {
+        const query = { _id: ObjectId(id) }
+        const updateDoc = {
+            $set: { ReviewText: reviewText }
+        }
+        const result = await ReviewsCollection.updateOne(query, updateDoc)
+        res.send(result)
+    } catch (error) {
         res.send(error.message)
     }
 })
