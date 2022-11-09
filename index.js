@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const cors = require('cors')
 const jwt = require('jsonwebtoken');
@@ -31,6 +31,7 @@ run().catch(err => console.log(err))
 
 //here the collection
 const ServicesCollection = client.db('alifPhotography').collection('Services')
+const ReviewsCollection = client.db('alifPhotography').collection('Reviews')
 
 //endsPoints 
 
@@ -53,6 +54,44 @@ app.get('/services', async (req, res) => {
             const services = await cursor.toArray()
             res.send(services)
         }
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+//api for get one single services data
+app.get('/services/:id', async (req, res) => {
+    try {
+        const id = req.params.id
+        const service = await ServicesCollection.findOne({ _id: ObjectId(id) })
+        res.send(service)
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+
+// api for post review
+app.post('/review', async (req, res) => {
+    try {
+        const review = req.body
+        // const newReview = { ...review, ReviewTime: new Date() }
+        // console.log(newReview);
+        const result = await ReviewsCollection.insertOne({ ...review, ReviewTime: new Date() })
+        res.send(result)
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+// api for get review.
+app.get('/services/reviews/:id', async (req, res) => {
+    try {
+        const id = req.params.id
+        const cursor = ReviewsCollection.find({ ServiceId: id }).sort({ ReviewTime: -1 })
+        const reviews = await cursor.toArray()
+        res.send(reviews)
+
     }
     catch (error) {
         res.send(error.message)
