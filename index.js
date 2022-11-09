@@ -75,8 +75,6 @@ app.get('/services/:id', async (req, res) => {
 app.post('/review', async (req, res) => {
     try {
         const review = req.body
-        // const newReview = { ...review, ReviewTime: new Date() }
-        // console.log(newReview);
         const result = await ReviewsCollection.insertOne({ ...review, ReviewTime: new Date() })
         res.send(result)
     }
@@ -84,7 +82,7 @@ app.post('/review', async (req, res) => {
         res.send(error.message)
     }
 })
-// api for get review.
+// api for get review by service-Id
 app.get('/services/reviews/:id', async (req, res) => {
     try {
         const id = req.params.id
@@ -92,6 +90,42 @@ app.get('/services/reviews/:id', async (req, res) => {
         const reviews = await cursor.toArray()
         res.send(reviews)
 
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+// api for get review by email
+app.get('/reviews', async (req, res) => {
+    const email = req.query.email
+    console.log(email);
+    try {
+        const cursor = ReviewsCollection.find({ ReviewerEmail: email })
+        const reviews = await cursor.toArray()
+        res.send(reviews)
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+//api for deleting a order
+app.delete('/review/:id', async (req, res) => {
+    id = req.params.id
+    try {
+        const result = await ReviewsCollection.deleteOne({ _id: ObjectId(id) })
+        res.send(result)
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+//api for get single review
+app.get('/review/:id', async (req, res) => {
+    id = req.params.id
+    console.log(id);
+    try {
+        const review = await ReviewsCollection.findOne({ _id: ObjectId(id) })
+        res.send(review)
     }
     catch (error) {
         res.send(error.message)
