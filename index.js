@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 app.get('/services', async (req, res) => {
     try {
         const query = {}
-        const cursor = ServicesCollection.find(query)
+        const cursor = ServicesCollection.find(query).sort({ _id: -1 })
         const value = req.query.route
         if (value) {
             const services = await cursor.limit(3).toArray()
@@ -54,6 +54,17 @@ app.get('/services', async (req, res) => {
             const services = await cursor.toArray()
             res.send(services)
         }
+    }
+    catch (error) {
+        res.send(error.message)
+    }
+})
+// api for all/multiple data
+app.post('/service', async (req, res) => {
+    try {
+        const service = req.body
+        const result = await ServicesCollection.insertOne(service)
+        res.send(result)
     }
     catch (error) {
         res.send(error.message)
