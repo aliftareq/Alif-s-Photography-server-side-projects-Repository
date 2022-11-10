@@ -54,7 +54,7 @@ const ReviewsCollection = client.db('alifPhotography').collection('Reviews')
 
 //root api
 app.get('/', (req, res) => {
-    res.send('alif catering service server is running')
+    res.send('alif Photography service server is running')
 })
 
 // api for all/multiple data

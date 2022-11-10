@@ -1,7 +1,7 @@
 {
-  "name": "alif-catering-serverside",
+  "name": "alif-Photograpy",
   "version": "1.0.0",
-  "description": "\"This is for alif's catering service server\"",
+  "description": "\"This is for alif's Photograpy service server\"",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
