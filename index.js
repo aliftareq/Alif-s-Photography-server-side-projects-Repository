@@ -29,6 +29,23 @@ async function run() {
 }
 run().catch(err => console.log(err))
 
+//common function for using in routes
+// function varifyJWT(req, res, next) {
+//     const authHeader = req.headers.authorization
+//     if (!authHeader) {
+//         return res.status(401).send({ message: 'unauthorized Access' })
+//     }
+//     const token = authHeader.split(' ')[1]
+//     //varifying aceess token
+//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+//         if (err) {
+//             return res.status(403).send({ message: 'Invalid Token' })
+//         }
+//         req.decoded = decoded
+//         next()
+//     })
+// }
+
 //here the collection
 const ServicesCollection = client.db('alifPhotography').collection('Services')
 const ReviewsCollection = client.db('alifPhotography').collection('Reviews')
@@ -152,6 +169,19 @@ app.patch('/review/:id', async (req, res) => {
         const result = await ReviewsCollection.updateOne(query, updateDoc)
         res.send(result)
     } catch (error) {
+        res.send(error.message)
+    }
+})
+
+//api for JWT 
+app.post('/jwt', async (req, res) => {
+    try {
+        const user = req.body
+        console.log(user);
+        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+        res.send({ token })
+    }
+    catch (error) {
         res.send(error.message)
     }
 })
