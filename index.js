@@ -30,21 +30,21 @@ async function run() {
 run().catch(err => console.log(err))
 
 //common function for using in routes
-// function varifyJWT(req, res, next) {
-//     const authHeader = req.headers.authorization
-//     if (!authHeader) {
-//         return res.status(401).send({ message: 'unauthorized Access' })
-//     }
-//     const token = authHeader.split(' ')[1]
-//     //varifying aceess token
-//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-//         if (err) {
-//             return res.status(403).send({ message: 'Invalid Token' })
-//         }
-//         req.decoded = decoded
-//         next()
-//     })
-// }
+function varifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+        return res.status(401).send({ message: 'unauthorized Access' })
+    }
+    const token = authHeader.split(' ')[1]
+    //varifying aceess token
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'Invalid Token' })
+        }
+        req.decoded = decoded
+        next()
+    })
+}
 
 //here the collection
 const ServicesCollection = client.db('alifPhotography').collection('Services')
@@ -124,7 +124,11 @@ app.get('/services/reviews/:id', async (req, res) => {
     }
 })
 // api for get review by email
-app.get('/reviews', async (req, res) => {
+app.get('/reviews', varifyJWT, async (req, res) => {
+    const decoded = req.decoded
+    if (decoded.email !== req.query.email) {
+        return res.status(403).send({ message: 'unauthorized Access!!!' })
+    }
     const email = req.query.email
     try {
         const cursor = ReviewsCollection.find({ ReviewerEmail: email })
@@ -136,7 +140,7 @@ app.get('/reviews', async (req, res) => {
     }
 })
 //api for deleting a order
-app.delete('/review/:id', async (req, res) => {
+app.delete('/review/:id', varifyJWT, async (req, res) => {
     id = req.params.id
     try {
         const result = await ReviewsCollection.deleteOne({ _id: ObjectId(id) })
@@ -147,7 +151,7 @@ app.delete('/review/:id', async (req, res) => {
     }
 })
 //api for get single review
-app.get('/review/:id', async (req, res) => {
+app.get('/review/:id', varifyJWT, async (req, res) => {
     id = req.params.id
     try {
         const review = await ReviewsCollection.findOne({ _id: ObjectId(id) })
@@ -158,7 +162,7 @@ app.get('/review/:id', async (req, res) => {
     }
 })
 //api for updating a review
-app.patch('/review/:id', async (req, res) => {
+app.patch('/review/:id', varifyJWT, async (req, res) => {
     const id = req.params.id
     const reviewText = req.body.newReviewText
     try {
